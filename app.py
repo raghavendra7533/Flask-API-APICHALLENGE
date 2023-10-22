@@ -1,15 +1,35 @@
-# This is a sample Python script.
+from flask import Flask, request, jsonify
+import helper
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+app = Flask(__name__)
+
+"""CONSTANTS"""
+FILENAME = "data.json"
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+@app.route("/")
+def home():
+    return jsonify("Welcome to Raghav's API Challenge!")
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+@app.route("/todo", methods=["GET", "POST"])
+def todos():
+    if request.method == "GET":
+        return helper.get_todos(FILENAME)
+
+    elif request.method == "POST":
+        add_data = request.get_json()
+        return helper.add_todo(add_data)
+
+
+@app.route("/todo/<modified_id>", methods=["GET", "PUT", "DELETE"])
+def delete_id(modified_id):
+    if request.method == "GET":
+        return helper.get_specific_id(modified_id, FILENAME)
+
+    elif request.method == "DELETE":
+        return helper.delete_json_item(modified_id, FILENAME)
+
+    elif request.method == "PUT":
+        edit_data = request.get_json()
+        return helper.edit_todo_item(edit_data, modified_id, FILENAME)
