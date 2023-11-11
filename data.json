@@ -1,14 +1,8 @@
 [
   {
     "Title": "Sample Todo Item",
-    "doneStatus": true,
     "description": "Hello Validating",
-    "id": "61037a1c95564abaa24783666b379203"
-  },
-  {
-    "Title": "Delete this Todo",
     "doneStatus": true,
-    "description": "fast af boi",
-    "id": "c3f4b18f4d7a4f39a4389897108f7542"
+    "id": "61037a1c95564abaa24783666b379203"
   }
 ]

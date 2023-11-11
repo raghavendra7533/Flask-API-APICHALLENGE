@@ -27,9 +27,11 @@ def load_json(filename):
     except FileNotFoundError:
         with open(LOGFILE, "a") as logfile:
             logfile.write(FILE_NOT_FOUND)
+        return jsonify({"Error": "JSON not in the expected format"}), 404
     except json.decoder.JSONDecodeError:
         with open(LOGFILE, "a") as logfile:
             logfile.write("JSON File not found\n")
+        return jsonify({"Error": "JSON not in the expected format"}), 404
 
 
 def get_todos(filename):
@@ -56,11 +58,12 @@ def update_json(data, filename="data.json"):
         with open(filename, "w") as file:
             json.dump(data, file)
         with open(LOGFILE, "a") as logfile:
-            logfile.write("DELETED\n")
+            logfile.write(f"DELETED {data}\n")
         return "Updated"
     except Exception as err:
         with open(LOGFILE, "a") as logfile:
             logfile.write(f"Error Occurred: {err}\n")
+        return jsonify({"Error": "JSON not in the expected format"}), 404
 
 
 def add_todo(json_file):
@@ -81,9 +84,9 @@ def add_todo(json_file):
             json.dump(json_data, f)
         return load_json(FILENAME)
     else:
-        with open(LOGFILE) as logfile:
+        with open(LOGFILE, "a") as logfile:
             logfile.write("JSON not in the expected format\n")
-        return "JSON not in the expected format"
+        return jsonify({"Error": "JSON not in the expected format"}), 404
 
 
 def delete_json_item(del_id, filename):
@@ -121,7 +124,9 @@ def edit_todo_item(edit_data, updates_edit_id, filename):
         get_updated_todos = load_json(filename)
         return get_updated_todos
     else:
-        return "JSON not in the expected format"
+        with open(LOGFILE, "a") as logfile:
+            logfile.write("JSON not in the expected format\n")
+        return jsonify({"Error": "JSON not in the expected format"}), 404
 
 
 def get_specific_id(modified_id, filename):
@@ -129,7 +134,6 @@ def get_specific_id(modified_id, filename):
     for item in get_todo:
         if modified_id == item['id']:
             return jsonify(item)
-
 
 
 def check_json_structure(json_file):

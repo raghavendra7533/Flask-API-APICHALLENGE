@@ -12,7 +12,7 @@ def home():
     return jsonify("Welcome to Raghav's API Challenge!")
 
 
-@app.route("/todo", methods=["GET", "POST"])
+@app.route("/todo", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 def todos():
     if request.method == "GET":
         return helper.get_todos(FILENAME)
@@ -21,8 +21,12 @@ def todos():
         add_data = request.get_json()
         return helper.add_todo(add_data)
 
+    elif request.method == "PUT" or request.method == "DELETE" or request.method == "PATCH":
+        error = {"error": "Method Not Allowed"}
+        return jsonify(error), 405
 
-@app.route("/todo/<modified_id>", methods=["GET", "PUT", "DELETE"])
+
+@app.route("/todo/<modified_id>", methods=["GET", "PUT", "DELETE", "POST"])
 def delete_id(modified_id):
     if request.method == "GET":
         return helper.get_specific_id(modified_id, FILENAME)
@@ -33,3 +37,7 @@ def delete_id(modified_id):
     elif request.method == "PUT":
         edit_data = request.get_json()
         return helper.edit_todo_item(edit_data, modified_id, FILENAME)
+
+    elif request.method == "POST":
+        error = {"error": "Method Not Allowed"}
+        return jsonify(error), 405
