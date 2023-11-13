@@ -85,7 +85,7 @@ def add_todo(json_file):
         return load_json(FILENAME)
     else:
         with open(LOGFILE, "a") as logfile:
-            logfile.write("JSON not in the expected format\n")
+            logfile.write(f"JSON not in the expected format: {json_file}\n")
         return jsonify({"Error": "JSON not in the expected format"}), 404
 
 
@@ -111,7 +111,7 @@ def edit_todo_item(edit_data, updates_edit_id, filename):
     :param edit_data: A dictionary with keys "Title", "Description", "doneStatus"
     :param updates_edit_id: The to-do id that has to be edited
     :param filename: A valid json file with the particular to-do
-    :return:
+    :return: updated to-do list
     """
     if check_json_structure(edit_data):
         get_todos = load_json(filename)
@@ -130,6 +130,11 @@ def edit_todo_item(edit_data, updates_edit_id, filename):
 
 
 def get_specific_id(modified_id, filename):
+    """
+    :param modified_id: The id of the to-do to be modified
+    :param filename: A valid json file with the particular to-do
+    :return: A json with the specific to-do
+    """
     get_todo = load_json(filename)
     for item in get_todo:
         if modified_id == item['id']:
