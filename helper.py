@@ -2,6 +2,7 @@ import json
 import uuid
 from schema import Schema, And, Use, SchemaError
 from flask import jsonify
+import logging
 
 """CONSTANTS"""
 FILE_NOT_FOUND = "File not found\n"
@@ -27,11 +28,11 @@ def load_json(filename):
     except FileNotFoundError:
         with open(LOGFILE, "a") as logfile:
             logfile.write(FILE_NOT_FOUND)
-        return jsonify({"Error": "JSON not in the expected format"}), 404
+        return json.dumps({"Error": "JSON not in the expected format"}), 404
     except json.decoder.JSONDecodeError:
         with open(LOGFILE, "a") as logfile:
             logfile.write("JSON File not found\n")
-        return jsonify({"Error": "JSON not in the expected format"}), 404
+        return json.dumps({"Error": "JSON not in the format"}), 404
 
 
 def get_todos(filename):
@@ -44,7 +45,8 @@ def get_todos(filename):
     lines = []
     for line in all_todos:
         lines.append(line)
-    return jsonify(lines)
+    json_data = json.dumps(lines)
+    return json_data
 
 
 def update_json(data, filename="data.json"):
@@ -57,13 +59,11 @@ def update_json(data, filename="data.json"):
     try:
         with open(filename, "w") as file:
             json.dump(data, file)
-        with open(LOGFILE, "a") as logfile:
-            logfile.write(f"DELETED {data}\n")
         return "Updated"
     except Exception as err:
         with open(LOGFILE, "a") as logfile:
             logfile.write(f"Error Occurred: {err}\n")
-        return jsonify({"Error": "JSON not in the expected format"}), 404
+        return json.dumps({"Error": "JSON not in the expected format"}), 404
 
 
 def add_todo(json_file):
@@ -82,27 +82,30 @@ def add_todo(json_file):
         json_data.append(data)
         with open("data.json", "w") as f:
             json.dump(json_data, f)
-        return load_json(FILENAME)
+        with open(LOGFILE, "a") as logfile:
+            logfile.write(f"ADDED todo: {data}")
+        added_id = json.dumps({'id': data['id']})
+        return added_id
     else:
         with open(LOGFILE, "a") as logfile:
             logfile.write(f"JSON not in the expected format: {json_file}\n")
-        return jsonify({"Error": "JSON not in the expected format"}), 404
+        return json.dumps({"Error": "JSON not in the expected format"}), 404
 
 
 def delete_json_item(del_id, filename):
     """
-    This function deletes a json item if it is in the json file using the id
+    This function deletes a json item if it is in the json file using the 'id'
     :param del_id: id of the to-do
     :param filename: The data.json file
     :return: the todos after deleting
     """
-    get_todos = load_json(filename)
-    for item in get_todos:
+    todos = load_json(filename)
+    for item in todos:
         if del_id in item['id']:
             item_data = item
-            get_todos.remove(item_data)
-    update_json(get_todos)
-    return get_todos
+            todos.remove(item_data)
+    update_json(todos)
+    return json.dumps(f"Deleted todo: {del_id}")
 
 
 def edit_todo_item(edit_data, updates_edit_id, filename):
@@ -114,19 +117,27 @@ def edit_todo_item(edit_data, updates_edit_id, filename):
     :return: updated to-do list
     """
     if check_json_structure(edit_data):
-        get_todos = load_json(filename)
-        for item in get_todos:
+        todos = load_json(filename)
+        for item in todos:
             if updates_edit_id in item['id']:
                 item['Title'] = edit_data['Title']
                 item['description'] = edit_data['Description']
                 item['doneStatus'] = edit_data['DoneStatus']
-        update_json(get_todos)
+        update_json(todos)
         get_updated_todos = load_json(filename)
-        return get_updated_todos
+        for edited_item in get_updated_todos:
+            if updates_edit_id in edited_item['id']:
+                edited_todo_item = json.dumps({
+                    "Title": edited_item['Title'],
+                    "description": edited_item['description'],
+                    "doneStatus": edited_item['doneStatus'],
+                    "id": edited_item['id']
+                })
+                return edited_todo_item
     else:
         with open(LOGFILE, "a") as logfile:
             logfile.write("JSON not in the expected format\n")
-        return jsonify({"Error": "JSON not in the expected format"}), 404
+        return json.dumps({"Error": "JSON not in the expected format"}), 404
 
 
 def get_specific_id(modified_id, filename):
@@ -138,7 +149,7 @@ def get_specific_id(modified_id, filename):
     get_todo = load_json(filename)
     for item in get_todo:
         if modified_id == item['id']:
-            return jsonify(item)
+            return json.dumps(item)
 
 
 def check_json_structure(json_file):

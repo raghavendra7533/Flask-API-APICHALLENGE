@@ -38,7 +38,7 @@
 3. FILENAME
 4. JSON_FORMAT (for schema validation)
 ### Functions
-1. `load_json`:
+1. `load_json`
 	This function loads the json file to return a list of the content in the file
 	:param filename: A valid json file
 	:return: A list of dictionaries
