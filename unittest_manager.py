@@ -7,7 +7,6 @@ from helper import load_json, get_todos, update_json
 class TestJson(unittest.TestCase):
 
     def setUp(self):
-        print("Setup")
         with open("data_unittest.json", "w+") as json_file:
             self.json_dict = [{
                 "Title": "Sample To-do Item",
@@ -23,7 +22,6 @@ class TestJson(unittest.TestCase):
             self.comparison_data = json.load(comparison_file)
 
     def tearDown(self):
-        print("teardown")
         if os.path.exists("data_unittest.json"):
             os.remove("data_unittest.json")
         if os.path.exists("error_data_unittest.txt"):
@@ -35,12 +33,35 @@ class TestJson(unittest.TestCase):
 
     def test_err_load_json(self):
         error_response = load_json("error_data_unittest.txt")
-        print(error_response)
         self.assertRaises(json.decoder.JSONDecodeError)
 
     def test_invalid_file_path_load_json(self):
         load_json("hello.json")
         self.assertRaises(FileNotFoundError)
+
+
+class TestReadTodos(unittest.TestCase):
+
+    def setUp(self):
+        with open("data_unittest.json", "w+") as json_file:
+            self.json_dict = [{
+                "Title": "Sample To-do Item",
+                "doneStatus": True,
+                "description": "Hello Validating",
+                "id": "8955a41cb7104d71a26e4e59b81925ca"
+            }]
+            json.dump(self.json_dict, json_file)
+        with open("error_data_unittest.txt", "w+") as error_json:
+            self.json_error = "Hello World"
+            error_json.write(self.json_error)
+        with open("data_unittest.json", "r") as comparison_file:
+            self.comparison_data = json.load(comparison_file)
+
+    def tearDown(self):
+        if os.path.exists("data_unittest.json"):
+            os.remove("data_unittest.json")
+        if os.path.exists("error_data_unittest.txt"):
+            os.remove("error_data_unittest.txt")
 
     def test_get_todos(self):
         response = get_todos("data_unittest.json")
@@ -49,6 +70,30 @@ class TestJson(unittest.TestCase):
     def test_invalid_file_path_get_todos(self):
         response = get_todos("test.txt")
         self.assertRaises(FileNotFoundError)
+
+
+class TestUpdateTodos(unittest.TestCase):
+
+    def setUp(self):
+        with open("data_unittest.json", "w+") as json_file:
+            self.json_dict = [{
+                "Title": "Sample To-do Item",
+                "doneStatus": True,
+                "description": "Hello Validating",
+                "id": "8955a41cb7104d71a26e4e59b81925ca"
+            }]
+            json.dump(self.json_dict, json_file)
+        with open("error_data_unittest.txt", "w+") as error_json:
+            self.json_error = "Hello World"
+            error_json.write(self.json_error)
+        with open("data_unittest.json", "r") as comparison_file:
+            self.comparison_data = json.load(comparison_file)
+
+    def tearDown(self):
+        if os.path.exists("data_unittest.json"):
+            os.remove("data_unittest.json")
+        if os.path.exists("error_data_unittest.txt"):
+            os.remove("error_data_unittest.txt")
 
     def test_update_json(self):
         json_element = [
@@ -73,3 +118,4 @@ class TestJson(unittest.TestCase):
         error_data = {"Hello World"}
         response = update_json(error_data, "data_unittest.json")
         self.assertRaises(json.decoder.JSONDecodeError)
+
