@@ -69,7 +69,7 @@ def update_json(data, filename="data.json"):
 def add_todo(json_file):
     """
     This function adds a to-do to the json file
-    :param json_file: A list with dictionaries of todos
+    :param json_file: A list with dictionaries of to-dos
     :return: A str with the status
     """
     if check_json_structure(json_file):
@@ -105,7 +105,7 @@ def delete_json_item(del_id, filename):
             item_data = item
             todos.remove(item_data)
     update_json(todos)
-    return json.dumps(f"Deleted todo: {del_id}")
+    return json.dumps(f"Deleted to-do: {del_id}")
 
 
 def edit_todo_item(edit_data, updates_edit_id, filename):
