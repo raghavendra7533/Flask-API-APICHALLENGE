@@ -4,7 +4,7 @@ import os
 from helper import load_json, get_todos, update_json
 
 
-class TestJson(unittest.TestCase):
+class TestLoadJson(unittest.TestCase):
 
     def setUp(self):
         with open("data_unittest.json", "w+") as json_file:
